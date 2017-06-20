@@ -236,14 +236,14 @@ class CoreValidator extends Validator implements CoreValidatorInterface
     public function remove($name, $ruleName = null)
     {
         if (!isset($this->_rules[$name]) && !isset($this->_sometimes[$name])) {
-            return true;
+            return $this;
         }
 
         // reset all rules for this field
         if ($ruleName === null) {
             unset($this->_rules[$name]);
             unset($this->_sometimes[$name]);
-            return true;
+            return $this;
         }
 
         // for rules
@@ -273,6 +273,8 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             $this->_sometimes[$name] = array_filter($conditionalRules);
             $this->_sometimes = array_filter($this->_sometimes);
         }
+        
+        return $this;
     }
 
 
