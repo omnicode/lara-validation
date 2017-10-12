@@ -17,13 +17,12 @@ It has the following advantages
 1. <a href="#installation">Installation</a>
 2. <a href="#quick-start">Quick start</a>
 3. <a href="#features">Features</a>
-	* <a href="#basic-example">Basic Example</a>
-	* <a href="#custom-message">Custom Validation Message</a>
-	* <a href="#conditional-validation-create-update">Conditional Validation during Create and Update</a>
-	* <a href="#conditional-validation-callable">Conditional Validation with Callable method</a>
-	* <a href="#add-laravel-rule">Adding Existing Laravel Rules</a>
-	* <a href="#add-multiple-validations">Adding Multiple Validations</a>
-	* <a href="#share-rules">Share Rules between Different policies</a>
+	* <a href="#basic-example">Basic example</a>
+	* <a href="#custom-message">Custom validation message</a>
+	* <a href="#conditional-validation-create-update">Conditional validation during create and update</a>
+	* <a href="#conditional-validation-callable">Conditional validation with callable method</a>
+	* <a href="#add-laravel-rule">Adding Existing laravel Rules</a>
+	* <a href="#share-rules">Share rules between different validations</a>
 4. <a href="#how-to">Methods</a>
     * <a href="#rule-required">required</a>
     * <a href="#rule-minlength">minLength</a>
@@ -33,9 +32,6 @@ It has the following advantages
     * <a href="#rule-unique">unique</a>
     * <a href="#rule-add">add</a>
     * <a href="#rule-remove">remove</a>
-4. <a href="#custom-rules">Custom Rules</a>
-5. <a href="#form-requetss">Using with Form Requests</a>
-5. <a href="#license">License</a>
  
 
 ## <a id="installation"></a>Installation
@@ -136,7 +132,7 @@ public function validationDefault()
 }
 ```
 
-### <a id="custom-message"></a>Custom Validation Message
+### <a id="custom-message"></a>Custom validation message
 
 ```
 $this->validator->required('first_name', 'First Name can not be empty');
@@ -145,7 +141,7 @@ $this->validator->required('first_name', 'First Name can not be empty');
 $this->validator->required('first_name', __('First Name can not be empty'));
 ```
 
-### <a id="conditional-validation-create-update"></a>Conditional Validation during Create and Update
+### <a id="conditional-validation-create-update"></a>Conditional validation during create and update
 
 To make the rule to be applied only when the record is being created or only when it is being updated
 ```
@@ -156,7 +152,7 @@ $this->validator->required('first_name', 'First Name can not be empty', 'create'
 $this->validator->required('first_name', 'First Name can not be empty', 'update');
 ```
 
-### <a id="conditional-validation-callable"></a>Conditional Validation with Callable method
+### <a id="conditional-validation-callable"></a>Conditional validation with callable method
 
 Use callable method for conditional validation
 
@@ -170,7 +166,7 @@ $this->validator->required('first_name', 'First Name can not be empty', function
 
 `$input` is and object of [Illuminate\Support\Fluent](https://laravel.com/api/5.3/Illuminate/Support/Fluent.html) that contains the data to be validated.
 
-### <a id="add-laravel-rule"></a>Adding Existing Laravel Rules
+### <a id="add-laravel-rule"></a>Adding existing Laravel rules
 
 If the rule does not have a wrapper, but it exists in Laravel, it can be easily added by
 
@@ -183,7 +179,7 @@ $this->validator->add('date_of_birth', 'date')
 It might be cases, that it is required to apply different rules during create or update, meanwhile sharing part of the rules:
 
 ```
-// this validation will require first_name, last_name and email
+// this validation will validate first_name, last_name and email
 public function validationDefault()
 {
 	$this->validator
@@ -194,7 +190,7 @@ public function validationDefault()
 	return $this->validator;
 }
 
-// this validation would require only first_name and last_name
+// this validation will validate only first_name and last_name
 public function validationEdit()
 {
 	// applies the rules from validationDefault
@@ -207,7 +203,7 @@ public function validationEdit()
 	return $this->validator;
 }
 
-// this validation would require first_name, last_name, email and gender
+// this validation will validate first_name, last_name, email and gender
 public function validationOther()
 {
 	// applies the rules from validationDefault
@@ -221,7 +217,7 @@ public function validationOther()
 }
 ```
 
-To validate the data by `validationDefault`
+To validate the data
 
 ```
 use App\Validators\UserValidator;
