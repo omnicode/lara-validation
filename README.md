@@ -5,12 +5,12 @@ Lara Validation is a powerful wrapper for laravel validations (it is influenced 
 It has the following advantages
 - More Logical way for defining rules
 - Allows to move validation rules away from controller, service or from other layers to a separate Validation layer
-- Makes rules re-usable through different service layers, controllers etc.
-- Allows to define multiple validation scenarios with shared rules
+- Makes validations re-usable between different service layers, controllers etc.
+- Allows to define multiple validations with shared rules
 - Easier to write custom validation messages
 - Better way of defining custom validation methods
 - Convenient features for defining conditional validation rules
-- Easily integrated with FormRequests
+- Easily integrated with Form Requests
 
 ## Contents
 
@@ -24,6 +24,7 @@ It has the following advantages
 	* <a href="#add-laravel-rule">Adding existing laravel rules</a>
 	* <a href="#add-custom-rule">Adding custom rules</a>
 	* <a href="#share-rules">Sharing rules between different validations</a>
+	* <a href="#form-requests">Using with form requests</a>
 4. <a href="#methods">Methods</a>
     * <a href="#rule-required">required</a>
     * <a href="#rule-minlength">minLength</a>
@@ -162,7 +163,7 @@ $this->validator->required('first_name', 'First Name can not be empty', function
 });
 ```
 
-`$input` is and object of [Illuminate\Support\Fluent](https://laravel.com/api/5.3/Illuminate/Support/Fluent.html) that contains the data to be validated.
+`$input` is and object of [Illuminate\Support\Fluent](https://laravel.com/api/5.4/Illuminate/Support/Fluent.html) that contains the data to be validated.
 
 ### <a id="add-laravel-rule"></a>Adding existing Laravel rules
 
@@ -176,18 +177,18 @@ $this->validator->add('date_of_birth', 'date')
 ```
 $this->validator->add('some_field', [
 	'rule' => function ($attribute, $value, $parameters, $validator){
-		// code here
+		// logic goes here
 		// return true to apply the validation or false otherwise
 	}
 ], __('Some optional validation message'));
 ```
 
-`$attribute`, `$value`, `$parameters` and `$validator` params of the method are defined [here](https://laravel.com/docs/5.3/validation#custom-validation-rules)
+`$attribute`, `$value`, `$parameters` and `$validator` params of the method are defined [here](https://laravel.com/docs/5.4/validation#custom-validation-rules)
 
  
 ### <a id="share-rules"></a>Sharing rules between different validations
 
-It might be cases, that it is required to apply different rules during create or update, meanwhile sharing part of the rules:
+It might be cases, that it is required to apply different set of validation rules with different scenarios - meanwhile sharing part of the rules:
 
 ```
 // this validation will validate first_name, last_name and email
@@ -244,7 +245,6 @@ public function __construct(UserValidator $userValidator)
 
 public function someMethod()
 {
-	
 	// $data - data to be validated
 
 	// to validate by `validationDefault` rules use
@@ -257,7 +257,6 @@ public function someMethod()
 
 	// to validate by `validationOther` rules use
 	$this->userValidator->isValid($data, ['rule' => 'other']);
-	
 }
 ```
 
@@ -268,7 +267,7 @@ Here is the list of predefined methods and wrappers
 for all methods
 - `$name` - field name (required)
 - `$message` - the validation message (optional)
-- `$when` - for conditional validation, can be a string equal to `create` OR `updtae`, or a callable method
+- `$when` - for conditional validation, can be a string equal to `create` OR `updtae`, or a callable method (optional)
 
 ### <a id="rule-required"></a>required
 ```
@@ -324,7 +323,7 @@ $this->validator->unique('title', [Post::class, 'user_id'], __('This title alrea
 **Important Notice:** the field `user_id` should exist in the validation data
 
 
-
+## <a id="form-requests"></a>Using with form requests
 
 
 
