@@ -22,7 +22,8 @@ It has the following advantages
 	* <a href="#conditional-validation-create-update">Conditional Validation during Create and Update</a>
 	* <a href="#conditional-validation-callable">Conditional Validation with Callable method</a>
 	* <a href="#add-laravel-rule">Adding Existing Laravel Rules</a>
-	* <a href="#add-custom-rule">Adding Custom Rule</a>
+	* <a href="#add-multiple-validations">Adding Multiple Validations</a>
+	* <a href="#share-rules">Share Rules between Different policies</a>
 4. <a href="#how-to">Methods</a>
     * <a href="#rule-required">required</a>
     * <a href="#rule-minlength">minLength</a>
@@ -169,8 +170,92 @@ $this->validator->required('first_name', 'First Name can not be empty', function
 
 `$input` is and object of [Illuminate\Support\Fluent](https://laravel.com/api/5.3/Illuminate/Support/Fluent.html) that contains the data to be validated.
 
+### <a id="add-laravel-rule"></a>Adding Existing Laravel Rules
 
+If the rule does not have a wrapper, but it exists in Laravel, it can be easily added by
+
+```
+$this->validator->add('date_of_birth', 'date')
+```
  
+### <a id="share-rules"></a>Sharing Rules
+
+It might be cases, that it is required to apply different rules during create or update, meanwhile sharing part of the rules:
+
+```
+// this validation will require first_name, last_name and email
+public function validationDefault()
+{
+	$this->validator
+		->required('first_name')
+		->required('last_name')
+		->required('email');
+	
+	return $this->validator;
+}
+
+// this validation would require only first_name and last_name
+public function validationEdit()
+{
+	// applies the rules from validationDefault
+	$this->validationDefault();
+	
+	// remove existing rule
+	$this->validator
+		->remove('email');
+	
+	return $this->validator;
+}
+
+// this validation would require first_name, last_name, email and gender
+public function validationOther()
+{
+	// applies the rules from validationDefault
+	$this->validationDefault();
+	
+	// add new rule
+	$this->validator
+		->required('gender');
+	
+	return $this->validator;
+}
+```
+
+To validate the data by `validationDefault`
+
+```
+use App\Validators\UserValidator;
+
+// ... controller, service or other class
+
+protected $userValidator;
+
+public function __construct(UserValidator $userValidator)
+{
+	$this->userValidator = $userValidator;
+}
+
+public function someMethod()
+{
+	
+	// $data - data to be validated
+
+	// to validate by `validationDefault` rules use
+	$this->userValidator->isValid($data);
+	// which is the same as
+	$this->userValidator->isValid($data, ['rule' => 'default']);
+
+	// to validate by `validationEdit` rules use
+	$this->userValidator->isValid($data, ['rule' => 'edit']);
+
+	// to validate by `validationOther` rules use
+	$this->userValidator->isValid($data, ['rule' => 'other']);
+	
+}
+```
+
+
+
 
 
 
