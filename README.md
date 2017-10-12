@@ -267,7 +267,7 @@ Here is the list of predefined methods and wrappers
 for all methods
 - `$name` - field name (required)
 - `$message` - the validation message (optional)
-- `$when` - for conditional validation, can be a string equal to `create` OR `updtae`, or a callable method (optional)
+- `$when` - for conditional validation, can be a string equal to `create` OR `update`, or a callable method (optional)
 
 ### <a id="rule-required"></a>required
 ```
@@ -325,7 +325,32 @@ $this->validator->unique('title', [Post::class, 'user_id'], __('This title alrea
 
 ## <a id="form-requests"></a>Using with form requests
 
+The rules defined by LaraValidation can be easily used in Form Requests, for that `rules` and `messages` methods should be used, which return the list of validation rules in native format and the list of messages respectively.
 
+```
+<?php
+namespace App\Http\Requests;
+
+use App\Validators\PostValidator;
+
+class PostRequest
+{
+    /**
+     * @var PostValidator
+     */
+    protected $postValidator;
+
+    /**
+     * @param PostValidator $postValidator
+     */
+    public function __construct(PostValidator $postValidator)
+    {
+        $this->rules = $postValidator->validationDefault()->rules();
+        $this->messages = $postValidator->validationDefault()->messages();
+    }
+
+}
+```
 
 
 
