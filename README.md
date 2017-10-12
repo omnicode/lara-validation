@@ -315,13 +315,14 @@ $this->validator->unique('email', 'users', __('Email already exists. Please rest
 $this->validator->unique('field_name', Post::class, __('This value already exists'))
 ```
 
-- array, which's first value is the Model's class and the following parameters are columns that should be considered during checking the uniqueness: suppose we need to force unique `title` field per user-bases
+- array, which's first value is the Model's class and the following parameters are columns that should be considered during checking the uniqueness: suppose we need to force unique `title` field per user-basis
 
 ```
 $this->validator->unique('title', [Post::class, 'user_id'], __('This title already exists'))
 ```
 
 **Important Notice:** the field `user_id` should exist in the validation data
+
 
 
 
