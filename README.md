@@ -174,6 +174,9 @@ $this->validator->add('date_of_birth', 'date')
 ```
 
 ### <a id="add-custom-rule"></a>Adding custom rules
+
+Using `add` method custom rules by callable methods can be defined
+
 ```
 $this->validator->add('some_field', [
 	'rule' => function ($attribute, $value, $parameters, $validator){
@@ -182,6 +185,9 @@ $this->validator->add('some_field', [
 	}
 ], __('Some optional validation message'));
 ```
+
+for the second parameter(in the array), `implicit` option can be defined as well. More info [here](https://laravel.com/docs/5.4/validation#custom-validation-rules)
+
 
 `$attribute`, `$value`, `$parameters` and `$validator` params of the method are defined [here](https://laravel.com/docs/5.4/validation#custom-validation-rules)
 
