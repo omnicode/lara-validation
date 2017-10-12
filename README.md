@@ -21,18 +21,16 @@ It has the following advantages
 	* <a href="#custom-message">Custom validation message</a>
 	* <a href="#conditional-validation-create-update">Conditional validation during create and update</a>
 	* <a href="#conditional-validation-callable">Conditional validation with callable method</a>
-	* <a href="#add-laravel-rule">Adding Existing laravel Rules</a>
-	* <a href="#share-rules">Share rules between different validations</a>
-4. <a href="#how-to">Methods</a>
+	* <a href="#add-laravel-rule">Adding existing laravel rules</a>
+	* <a href="#add-custom-rule">Adding custom rules</a>
+	* <a href="#share-rules">Sharing rules between different validations</a>
+4. <a href="#methods">Methods</a>
     * <a href="#rule-required">required</a>
     * <a href="#rule-minlength">minLength</a>
     * <a href="#rule-maxlength">maxLength</a>
     * <a href="#rule-email">email</a>
     * <a href="#rule-numeric">numeric</a>
-    * <a href="#rule-unique">unique</a>
-    * <a href="#rule-add">add</a>
-    * <a href="#rule-remove">remove</a>
- 
+    * <a href="#rule-unique">unique</a> 
 
 ## <a id="installation"></a>Installation
 
@@ -173,8 +171,21 @@ If the rule does not have a wrapper, but it exists in Laravel, it can be easily 
 ```
 $this->validator->add('date_of_birth', 'date')
 ```
+
+### <a id="add-custom-rule"></a>Adding custom rules
+```
+$this->validator->add('some_field', [
+	'rule' => function ($attribute, $value, $parameters, $validator){
+		// code here
+		// return true to apply the validation or false otherwise
+	}
+], __('Some optional validation message'));
+```
+
+`$attribute`, `$value`, `$parameters` and `$validator` params of the method are defined [here](https://laravel.com/docs/5.3/validation#custom-validation-rules)
+
  
-### <a id="share-rules"></a>Sharing Rules
+### <a id="share-rules"></a>Sharing rules between different validations
 
 It might be cases, that it is required to apply different rules during create or update, meanwhile sharing part of the rules:
 
@@ -251,10 +262,66 @@ public function someMethod()
 ```
 
 
+## <a id="methods"></a>Existing methods
+Here is the list of predefined methods and wrappers
 
+for all methods
+- `$name` - field name (required)
+- `$message` - the validation message (optional)
+- `$when` - for conditional validation, can be a string equal to `create` OR `updtae`, or a callable method
 
+### <a id="rule-required"></a>required
+```
+public function required($name, $message = '', $when = null)
+```
+`$name` can be either string as the field name or array of fields (however in case of array the same error message will be used for all provided fields)
 
+### <a id="rule-minlength"></a>minLength
+```
+public function minLength($name, $length, $message = '', $when = null)
+```
+`$length` mininum number of characters to be allowed
 
+### <a id="rule-maxlength"></a>maxLength
+```
+public function maxLength($name, $length, $message = '', $when = null)
+```
+`$length` maximum number of characters to be allowed
+
+### <a id="rule-email"></a>email
+```
+public function email($name, $message = '', $when = null)
+```
+
+### <a id="rule-numeric"></a>numeric
+```
+public function numeric($name, $message = '', $when = null)
+```
+
+### <a id="rule-unique"></a>unique
+```
+public function unique($name, $params = [], $message = '', $when = null)
+```
+
+`$params` can be either
+- string - as a db table's exact name
+```
+$this->validator->unique('email', 'users', __('Email already exists. Please restore your password'));
+```
+
+- Model's class, e.g.
+
+```
+$this->validator->unique('field_name', Post::class, __('This value already exists'))
+```
+
+- array, which's first value is the Model's class and the following parameters are columns that should be considered during checking the uniqueness: suppose we need to force unique `title` field per user-bases
+
+```
+$this->validator->unique('title', [Post::class, 'user_id'], __('This title already exists'))
+```
+
+**Important Notice:** the field `user_id` should exist in the validation data
 
 
 
