@@ -12,9 +12,18 @@ It has the following advantages
 - Convenient features for defining conditional validation rules
 - Easily integrated with FormRequests
 
+## Contents
+
 1. <a href="#installation">Installation</a>
 2. <a href="#quick-start">Quick start</a>
-3. <a href="#how-to">How To Use / Examples</a>
+3. <a href="#features">Features</a>
+	* <a href="#basic-example">Basic Example</a>
+	* <a href="#custom-message">Custom Validation Message</a>
+	* <a href="#conditional-validation-create-update">Conditional Validation during Create and Update</a>
+	* <a href="#conditional-validation-callable">Conditional Validation with Callable method</a>
+	* <a href="#add-laravel-rule">Adding Existing Laravel Rules</a>
+	* <a href="#add-custom-rule">Adding Custom Rule</a>
+4. <a href="#how-to">Methods</a>
     * <a href="#rule-required">required</a>
     * <a href="#rule-minlength">minLength</a>
     * <a href="#rule-maxlength">maxLength</a>
@@ -110,8 +119,11 @@ public function someMethod()
 ```
 
 
-## <a id="how-to"></a>How To Use / Examples
+## <a id="Features"></a>Features
 LaraValidadtion has some pre-defined methods, each method has the parameter for providing the field name, possible paramters based on each rule, as well as an optional `$when` parameter which might a callable function, or a string as `create` or `update`. Any laravel  validation rules that do not have wrappers can be easily added by `add` method, which allows also to add custom validation methods as a callable function.
+
+
+### <a id="basic-example"></a>Basic Example
 
 To make the field to be required we can simply write
 ```
@@ -123,7 +135,7 @@ public function validationDefault()
 }
 ```
 
-*To provide custom validation message*
+### <a id="custom-message"></a>Custom Validation Message
 
 ```
 $this->validator->required('first_name', 'First Name can not be empty');
@@ -132,16 +144,21 @@ $this->validator->required('first_name', 'First Name can not be empty');
 $this->validator->required('first_name', __('First Name can not be empty'));
 ```
 
-*To make the rule to be applied only when the record is being created or only when it is being updated*
+### <a id="conditional-validation-create-update"></a>Conditional Validation during Create and Update
+
+To make the rule to be applied only when the record is being created or only when it is being updated
 ```
-// the first_name will be required only when creating
+// the first_name will be required only when creating a record
 $this->validator->required('first_name', 'First Name can not be empty', 'create');
 
-// the first_name will be required only when updating
+// the first_name will be required only when updating the record
 $this->validator->required('first_name', 'First Name can not be empty', 'update');
 ```
 
-*Use callable method for conditional validation*
+### <a id="conditional-validation-callable"></a>Conditional Validation with Callable method
+
+Use callable method for conditional validation
+
 ```
 // the rule will be applied only if the callable method returns true
 $this->validator->required('first_name', 'First Name can not be empty', function($input) {
