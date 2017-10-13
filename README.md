@@ -1,4 +1,4 @@
-# Lara Validation
+# Lara Validation - wrapper for Laravel Validation
 
 Lara Validation is a powerful wrapper for laravel validations (it is influenced by Cakephp 3 validations)
 
