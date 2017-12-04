@@ -116,7 +116,7 @@ public function someMethod()
 
 
 ## <a id="Features"></a>Features
-LaraValidadtion has some pre-defined methods, each method has the parameter for providing the field name, possible paramters based on each rule, as well as an optional `$when` parameter which might a callable function, or a string as `create` or `update`. Any laravel  validation rules that do not have wrappers can be easily added by `add` method, which allows also to add custom validation methods as a callable function.
+LaraValidation has some pre-defined methods, each method has the parameter for providing the field name, possible paramters based on each rule, as well as an optional `$when` parameter which might a callable function, or a string as `create` or `update`. Any laravel  validation rules that do not have wrappers can be easily added by `add` method, which allows also to add custom validation methods as a callable function.
 
 
 ### <a id="basic-example"></a>Basic Example
