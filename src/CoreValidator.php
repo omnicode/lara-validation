@@ -27,7 +27,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
 
     public function __construct()
     {
-        ValidationRules::process();
+        ValidationRules::execute();
     }
 
     /**
