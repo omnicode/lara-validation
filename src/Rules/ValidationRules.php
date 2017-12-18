@@ -5,23 +5,11 @@ use Illuminate\Support\Facades\Validator;
 
 class ValidationRules
 {
-    /**
-     * @return bool
-     */
-    public static function process()
-    {
-        static $inst = null;
-        if ($inst === null) {
-            $inst = self::execute();
-        }
-
-        return $inst;
-    }
 
     /**
      * @return bool
      */
-    protected static function execute()
+    public static function execute()
     {
         /**
          * Custom Rule for unique validation
