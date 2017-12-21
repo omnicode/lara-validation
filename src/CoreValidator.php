@@ -82,6 +82,16 @@ class CoreValidator extends Validator implements CoreValidatorInterface
     }
 
     /**
+     * returns the rules in array format
+     *
+     * @return array
+     */
+    protected function _rules()
+    {
+        return $this->_rules;
+    }
+
+    /**
      * return list of messages
      *
      * @return array
@@ -184,6 +194,29 @@ class CoreValidator extends Validator implements CoreValidatorInterface
         return $this;
     }
 
+    /**
+     * alias for bail
+     *
+     * @return CoreValidator
+     */
+    public function last()
+    {
+        return $this->bail();
+    }
+
+    /**
+     * if the previous rule fails, does not validate other rules of this attr
+     *
+     * @return $this
+     */
+    public function bail()
+    {
+        $attrs = array_keys($this->_rules());
+        $name = end($attrs);
+
+        $this->add($name, 'bail');
+        return $this;
+    }
 
     /**
      * @param $name
