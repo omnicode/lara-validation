@@ -107,7 +107,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      * @param null $message
      * @return $this
      */
-    public function requireIfIsset($name, $message = null)
+    public function requiredIfIsset($name, $message = null)
     {
         $this->required($name, $message, 'isset');
         return $this;
