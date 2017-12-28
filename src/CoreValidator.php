@@ -101,6 +101,19 @@ class CoreValidator extends Validator implements CoreValidatorInterface
         return $this->_messages;
     }
 
+
+    /**
+     * @param $name
+     * @param null $message
+     * @return $this
+     */
+    public function requireIfIsset($name, $message = null)
+    {
+        $this->required($name, $message, 'isset');
+        return $this;
+    }
+    
+
     /**
      * @param array|string $name
      * @param string $message
@@ -115,9 +128,20 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             ];
         }
 
+        // prevent duplicate validation rules
         $name = array_unique($name);
-        foreach ($name as $n) {
-            $this->add($n, 'required', $message, $when);
+
+        // when array is provided
+        // [ 'name', 'title', 'first_name' => 'First Name is Required', 'last_name', 'gender' => 'Gender is Required' ]
+        foreach ($name as $n => $m) {
+            // if $n is int, means no custom message is provided - so use the default one
+            // and the message is actually the name
+            if (is_int($n)) {
+                $n = $m;
+                $m = $message;
+            }
+
+            $this->add($n, 'required', $m, $when);
         }
 
         return $this;
@@ -236,6 +260,8 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             $rule = $this->addCustomRule($name, $rule);
         }
 
+        $when = $this->checkWhen($name, $when);
+
         if (is_callable($when)) {
             $this->_sometimes[$name][$rule] = $when;
         } elseif (in_array($when, ['create', 'update'])) {
@@ -327,6 +353,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             return $length;
         }
 
+        // @TODO - this is for MYSQL only
         $types = [
             'tinytext' => 256,
             'text' => 65535,
@@ -362,5 +389,34 @@ class CoreValidator extends Validator implements CoreValidatorInterface
 
         return $validationName;
     }
+
+
+    /**
+     * Checks $when's string values
+     *
+     * @param $name
+     * @param null $when
+     * @return \Closure|null
+     */
+    private function checkWhen($name, $when = null)
+    {
+        // if "isset" is provided - validate only if the given value is set
+        if ($when === 'isset') {
+            return function($input) use ($name) {
+                return array_key_exists($name, $input->toArray());
+            };
+        }
+
+        // if "notempty" is provided - validate only if the given value is not empty
+        if ($when === 'notempty') {
+            return function($input) use ($name) {
+                $arr = $input->toArray();
+                return !empty($arr[$name]);
+            };
+        }
+
+        return null;
+    }
+
 
 }
