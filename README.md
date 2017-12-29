@@ -25,6 +25,7 @@ It has the following advantages
 	* <a href="#conditional-validation-callable">Conditional validation with callable method</a>
 	* <a href="#add-laravel-rule">Adding existing laravel rules</a>
 	* <a href="#add-custom-rule">Adding custom rules</a>
+	* <a href="#stop-on-first-failure">Stopping On First Validation Failure</a>
 	* <a href="#share-rules">Sharing rules between different validations</a>
 	* <a href="#form-requests">Using with form requests</a>
 4. <a href="#methods">Methods</a>
@@ -210,6 +211,18 @@ for the second parameter(in the array), `implicit` option can be defined as well
 
 `$attribute`, `$value`, `$parameters` and `$validator` params of the method are defined [here](https://laravel.com/docs/5.4/validation#custom-validation-rules)
 
+### <a id="stop-on-first-failure"></a>Stopping On First Validation Failure
+
+For stopping the valudation rules if the given rule fails, use `bail` or its alias `last`
+```
+	$this->validator
+		->numeric('some_field'
+		->bail()
+		->minLength('age', 50)
+		->maxLength('email', 100);
+	
+```
+in this case if `some_field` fails to be numeric it will not check for `minLength` or `maxLength` rules
  
 ### <a id="share-rules"></a>Sharing rules between different validations
 
