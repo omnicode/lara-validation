@@ -415,7 +415,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             };
         }
 
-        return null;
+        return $when;
     }
 
 
