@@ -109,8 +109,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      */
     public function requiredIfIsset($name, $message = null)
     {
-        $this->required($name, $message, 'isset');
-        return $this;
+        return $this->required($name, $message, 'isset');
     }
     
 
@@ -156,8 +155,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      */
     public function minLength($name, $length, $message = '', $when = null)
     {
-        $this->add($name, 'min:' . $length, $message);
-        return $this;
+        return $this->add($name, 'min:' . $length, $message);
     }
 
     /**
@@ -171,8 +169,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
     public function maxLength($name, $length, $message = '', $when = null)
     {
         $length = $this->getTextLength($length);
-        $this->add($name, 'max:' . $length, $message, $when);
-        return $this;
+        return $this->add($name, 'max:' . $length, $message, $when);
     }
 
     /**
@@ -183,8 +180,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      */
     public function email($name, $message = '', $when = null)
     {
-        $this->add($name, 'email', $message, $when);
-        return $this;
+        return $this->add($name, 'email', $message, $when);
     }
 
     /**
@@ -195,8 +191,12 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      */
     public function numeric($name, $message = '', $when = null)
     {
-        $this->add($name, 'numeric', $message, $when);
-        return $this;
+        return $this->add($name, 'numeric', $message, $when);
+    }
+
+    public function confirmed($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'confirmed', $message, $when);
     }
 
     /**
@@ -214,9 +214,9 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             ];
         }
 
-        $this->add($name, 'uniq:'.implode(',', $params), $message, $when);
-        return $this;
+        return  $this->add($name, 'uniq:'.implode(',', $params), $message, $when);
     }
+
 
     /**
      * alias for bail
