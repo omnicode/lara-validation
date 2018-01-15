@@ -1,6 +1,10 @@
 <?php
 namespace LaraValidation;
 
+use Illuminate\Support\Facades\Validator;
+use LaraValidation\Contracts\LaraValidatorInterface;
+use LaraValidation\Contracts\RuleInterface;
+
 abstract class LaraValidator implements LaraValidatorInterface
 {
 
@@ -31,6 +35,28 @@ abstract class LaraValidator implements LaraValidatorInterface
         $this->initialize();
         $this->validator = $validator;
     }
+
+//    public function setCustomRule($rule, $ruleName = '')
+//    {
+//        if (!ends_with($rule, 'Rule')) {
+//            //TODO not show exception
+//            throw new \Exception('The Rule Must be ends with "Rule"');
+//        }
+//
+//        $refl = new \ReflectionClass($rule);
+//        if (!in_array(RuleInterface::class, $refl->getInterfaceNames())) {
+//            //TODO not show exception
+//            throw new \Exception(sprintf('The Rule Must be implements %s interface', RuleInterface::class));
+//        }
+//
+//        if (empty($ruleName)) {
+//            $ruleName = last(explode(DIRECTORY_SEPARATOR, $rule));
+//            $ruleName = str_replace('Rule', '', $ruleName);
+//            $ruleName = lcfirst($ruleName);
+//        }
+//
+//        Validator::extend($ruleName, $rule . '@get');
+//    }
 
     /**
      *

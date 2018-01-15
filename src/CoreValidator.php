@@ -2,15 +2,29 @@
 namespace LaraValidation;
 
 use Illuminate\Support\Facades\Validator;
+use LaraValidation\Contracts\ArrayRuleInterface;
+use LaraValidation\Contracts\CoreValidatorInterface;
+use LaraValidation\Contracts\DateRuleInterface;
+use LaraValidation\Contracts\DBRuleInterface;
+use LaraValidation\Contracts\FileRuleInterface;
+use LaraValidation\Contracts\GeneralRuleInterface;
+use LaraValidation\Contracts\NumericRuleInterface;
+use LaraValidation\Contracts\StringRuleInterface;
 use LaraValidation\Rules\ValidationRules;
 
-class CoreValidator extends Validator implements CoreValidatorInterface
+class CoreValidator extends Validator implements CoreValidatorInterface, GeneralRuleInterface, NumericRuleInterface,
+    StringRuleInterface, ArrayRuleInterface, FileRuleInterface, DBRuleInterface, DateRuleInterface
 {
     /**
      * list of defined rules
      * @var array
      */
     protected $_rules = [];
+
+    /**
+     * @var null
+     */
+    protected $_lastField = null;
 
     /**
      * list of conditional rules
@@ -24,7 +38,9 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      */
     protected $_messages = [];
 
-
+    /**
+     * CoreValidator constructor.
+     */
     public function __construct()
     {
         ValidationRules::execute();
@@ -101,17 +117,9 @@ class CoreValidator extends Validator implements CoreValidatorInterface
         return $this->_messages;
     }
 
-
-    /**
-     * @param $name
-     * @param null $message
-     * @return $this
-     */
-    public function requiredIfIsset($name, $message = null)
-    {
-        return $this->required($name, $message, 'isset');
-    }
-    
+    /********************
+     *   General rules  *
+     *******************/
 
     /**
      * @param array|string $name
@@ -148,14 +156,130 @@ class CoreValidator extends Validator implements CoreValidatorInterface
 
     /**
      * @param $name
-     * @param $length
+     * @param $data
      * @param string $message
      * @param null $when
-     * @return $this
+     * @return CoreValidator
      */
-    public function minLength($name, $length, $message = '', $when = null)
+    public function requiredIf($name, $data, $message = '', $when = null)
     {
-        return $this->add($name, 'min:' . $length, $message);
+        return $this->fixMultiRuleStructure($name, 'required_if', $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function requiredUnless($name, $data, $message = '', $when = null)
+    {
+        return $this->fixMultiRuleStructure($name, 'required_unless', $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function requiredWith($name, $data, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'required_with', $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function requiredWithAll($name, $data, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'required_with_all', $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function requiredWithout($name, $data, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'required_without', $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function requiredWithoutAll($name, $data, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'required_without_all', $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function present($name, $message = '', $when = null)
+    {
+        return  $this->add($name, 'present', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function filled($name, $message = '', $when = null)
+    {
+        return  $this->add($name, 'filled', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function accepted($name, $message = '', $when = null)
+    {
+        return  $this->add($name, 'accepted', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function nullable($name, $message = '', $when = null)
+    {
+        return  $this->add($name, 'nullable', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $size
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function size($name, $size, $message = '', $when = null)
+    {
+        return  $this->fixRuleStructure($name, 'size', $size, $message, $when);
     }
 
     /**
@@ -163,60 +287,50 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      * @param $length
      * @param string $message
      * @param null $when
-     * @return $this
-     * @throws \Exception
+     * @return CoreValidator
+     */
+    public function minLength($name, $length, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'min', $length, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $length
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
      */
     public function maxLength($name, $length, $message = '', $when = null)
     {
         $length = $this->getTextLength($length);
-        return $this->add($name, 'max:' . $length, $message, $when);
+        return $this->fixRuleStructure($name, 'max', $length, $message, $when);
     }
 
     /**
      * @param $name
-     * @param string $message
-     * @param $when
-     * @return $this
-     */
-    public function email($name, $message = '', $when = null)
-    {
-        return $this->add($name, 'email', $message, $when);
-    }
-
-    /**
-     * @param $name
+     * @param $min
+     * @param $max
      * @param string $message
      * @param null $when
-     * @return $this
+     * @return CoreValidator
      */
-    public function numeric($name, $message = '', $when = null)
+    public function between($name, $min, $max, $message = '', $when = null)
     {
-        return $this->add($name, 'numeric', $message, $when);
-    }
-
-    public function confirmed($name, $message = '', $when = null)
-    {
-        return $this->add($name, 'confirmed', $message, $when);
+        return $this->fixRuleStructure($name, 'between', [$min, $max], $message, $when);
     }
 
     /**
      * @param $name
-     * @param $params
-     * @param $message
+     * @param $value
+     * @param string $message
      * @param null $when
-     * @return $this
+     * @return CoreValidator
      */
-    public function unique($name, $params = [], $message = '', $when = null)
+    public function different($name, $value, $message = '', $when = null)
     {
-        if (is_string($params)) {
-            $params = [
-                $params
-            ];
-        }
-
-        return  $this->add($name, 'uniq:'.implode(',', $params), $message, $when);
+        return $this->fixRuleStructure($name, 'different', $value, $message, $when);
     }
-
 
     /**
      * alias for bail
@@ -235,11 +349,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      */
     public function bail()
     {
-        $attrs = array_keys($this->_rules());
-        $name = end($attrs);
-
-        $this->add($name, 'bail');
-        return $this;
+        return $this->add($this->_lastField, 'bail');
     }
 
     /**
@@ -282,6 +392,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             $this->_messages[$messageRule] = $message;
         }
 
+        $this->_lastField = $name;
         return $this;
     }
 
@@ -290,7 +401,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      *
      * @param $name
      * @param $ruleName - if not provided all rules of the given field will be removed
-     * @return bool
+     * @return $this
      */
     public function remove($name, $ruleName = null)
     {
@@ -332,10 +443,396 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             $this->_sometimes[$name] = array_filter($conditionalRules);
             $this->_sometimes = array_filter($this->_sometimes);
         }
-        
+
         return $this;
     }
 
+
+    /********************
+     *   Numeric rules  *
+     *******************/
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function numeric($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'numeric', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function integer($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'integer', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $value
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function digits($name, $value, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'digits', $value, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $min
+     * @param $max
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function digitsBetween($name, $min, $max, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'digits_between', [$min, $max], $message, $when);
+    }
+
+
+    /********************
+     *   String rules   *
+     *******************/
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function email($name, $message = '', $when = null)
+    {
+        return  $this->add($name, 'email', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function startsWith($name, $data, $message = '', $when = null)
+    {
+        return $this->addStringMethodRule($name, 'starts_with', $data, $message = '', $when = null);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function endsWith($name, $data, $message = '', $when = null)
+    {
+        return $this->addStringMethodRule($name, 'ends_with', $data, $message = '', $when = null);
+    }
+
+    /**
+     * @param $name
+     * @param $pattern
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function is($name, $pattern, $message = '', $when = null)
+    {
+        if (empty($message)) {
+            $message = sprintf('The %s must be is pattern of %s ' , $name, $pattern);
+        }
+
+        return $this->add($name, [
+            'rule' => function ($attribute, $value, $parameters, $validator) use ($pattern) {
+                if (empty($value)) {
+                    return true;
+                }
+
+                return str_is($pattern, $value);
+            }], $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $regex
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function regex($name, $regex, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'regex' , $regex, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function confirmed($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'confirmed', $message, $when);
+    }
+
+    /********************
+     *   Array rules    *
+     *******************/
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function isArray($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'array', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function in($name, $data, $message = '', $when = null)
+    {
+        if (is_array($data)) {
+            $data = implode(',', $data);
+        }
+        return $this->add($name, 'in:' . $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function notIn($name, $data, $message = '', $when = null)
+    {
+        if (is_array($data)) {
+            $data = implode(',', $data);
+        }
+        return $this->add($name, 'note_in:' . $data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function isCheckbox($name, $message = '', $when = null)
+    {
+        return $this->in($name, [0, 1], $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $class
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function inClassConstant($name, $class, $message = '', $when = null)
+    {
+        $refl = new \ReflectionClass($class);
+        $data = $refl->getConstants();
+        return $this->in($name, $data, $message, $when);
+    }
+
+    /********************
+     *   Date rules     *
+     *******************/
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function date($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'date', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $format
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function dateFormat($name, $format, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'date_format', $format, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $date
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function before($name, $date, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'before', $date, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $date
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function after($name, $date, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'after' . $date, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $date
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function afterOrEqual($name, $date, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'after_or_equal', $date, $message, $when);
+    }
+
+    /********************
+     *   File rules     *
+     *******************/
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function file($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'file', $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function mimes($name, $data, $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'mimes' ,$data, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function image($name, $message = '', $when = null)
+    {
+        return $this->add($name, 'image', $message, $when);
+    }
+
+    /********************
+     *     DB rules     *
+     *******************/
+    /**
+     * @param $name
+     * @param array $params
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function exists($name, $params = [], $message = '', $when = null)
+    {
+        $this->makeArray($params);
+
+        $model = array_shift($params);
+        $table = class_exists($model) ? app($model)->getTable() : $model;
+        $column = !empty($params) ? array_shift($params) : $name;
+        $connection = !empty($params) ? array_shift($params) : '';
+
+        $ruleStr = $connection ? $connection . '.' : '';
+        $ruleStr .= $table . ',' . $column;
+
+        return $this->fixRuleStructure($name, 'exists',  $ruleStr, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param array $params
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function multiExists($name, $params = [], $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'multiExists', $params, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param array $params
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     *
+     * [class, ['column' => value]]
+     * [class, column1, ['column2' => value2]]
+     * [class, column1, ['column2' => value2, column3 => value3]]
+     * [class, column1, ['column2' => value2], [column3 => value3]]
+     */
+    public function existsIf($name, $params = [], $message = '', $when = null)
+    {
+        return $this->fixDbIfRuleStructure($name, 'existsIf', $params, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param array $params
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    public function multiExistsIf($name, $params = [], $message = '', $when = null)
+    {
+        return $this->fixDbIfRuleStructure($name, 'multiExistsIf', $params, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $params
+     * @param $message
+     * @param null $when
+     * @return $this
+     */
+    public function unique($name, $params = [], $message = '', $when = null)
+    {
+        return $this->fixRuleStructure($name, 'uniq', $params, $message, $when);
+    }
 
     /**
      * TINYTEXT	256 bytes
@@ -360,13 +857,13 @@ class CoreValidator extends Validator implements CoreValidatorInterface
             'mediumtext' => 16777215,
             'longtext' => 4294967295
         ];
+
         if (isset($types[$length])) {
             return $types[$length];
         }
 
         throw new \Exception('Invalid length attribute');
     }
-
 
     /**
      * @param $name
@@ -390,7 +887,6 @@ class CoreValidator extends Validator implements CoreValidatorInterface
         return $validationName;
     }
 
-
     /**
      * Checks $when's string values
      *
@@ -398,7 +894,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface
      * @param null $when
      * @return \Closure|null
      */
-    private function checkWhen($name, $when = null)
+    protected function checkWhen($name, $when = null)
     {
         // if "isset" is provided - validate only if the given value is set
         if ($when === 'isset') {
@@ -419,4 +915,116 @@ class CoreValidator extends Validator implements CoreValidatorInterface
     }
 
 
+    /**
+     * @param $name
+     * @param $rule
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return $this|CoreValidator
+     *
+     * $data = 'field,value1,value2,value3'
+     * $data = [field, value1,value2,value3]
+     * $data = [
+     *     field1 => value1
+     *     field2 => [value1, value2]
+     * ]
+     */
+    protected function fixMultiRuleStructure($name, $rule, $data, $message = '', $when = null)
+    {
+        if (is_string($data) || is_numeric(head(array_keys($data)))) {
+            return  $this->fixRuleStructure($name, $rule, $data, $message, $when);
+        }
+
+        foreach ($data as $filed => $values) {
+            $this->makeArray($values);
+            array_unshift($values, $filed);
+            $this->fixRuleStructure($name, $rule, $values, $message, $when);
+        }
+
+        return  $this;
+    }
+
+    /**
+     * @param $name
+     * @param $rule
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     *
+     * $data = 'field1,field2,field3'
+     * $data = [field1, field2, field3]
+     */
+    protected function fixRuleStructure($name, $rule, $data, $message = '', $when = null)
+    {
+        $this->makeArray($data);
+        $rule = sprintf('%s:%s', $rule, implode(',', $data));
+        return $this->add($name, $rule, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $rule
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    protected function fixDbIfRuleStructure($name, $rule, $data, $message = '', $when = null)
+    {
+        $this->makeArray($data);
+        $rule .= ':';
+
+        foreach ($data as $datum) {
+            if (is_array($datum)) {
+                foreach ($datum as $key => $value) {
+                    $rule .= $key . '=>' . $value . ',';
+                }
+            } else {
+
+                $rule .= $datum . ',';
+            }
+        }
+
+        $rule = rtrim($rule, ',');
+        return $this->add($name, $rule, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param $method
+     * @param $data
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     */
+    protected function addStringMethodRule($name, $method, $data , $message = '', $when = null) {
+        $this->makeArray($data);
+
+        if (empty($message)) {
+            $message = sprintf('The %s must be %s ' , $name, str_replace('_', ' ', $method));
+            $message .= count($data) == 1 ? '' : 'one of ';
+            $message .= implode(', ', $data);
+        }
+
+        return $this->add($name, [
+            'rule' => function ($attribute, $value, $parameters, $validator) use ($method, $data) {
+                if (empty($value)) {
+                    return true;
+                }
+
+                return $method($value, $data);
+            }], $message, $when);
+    }
+
+    /**
+     * @param $array
+     */
+    protected function makeArray(&$array)
+    {
+        if (!is_array($array)) {
+            $array = [$array];
+        }
+    }
 }
