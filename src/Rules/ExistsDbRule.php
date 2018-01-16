@@ -3,7 +3,7 @@ namespace LaraValidation\Rules;
 
 use LaraValidation\Contracts\RuleInterface;
 
-class MultiExistsIfRule extends DbRule implements RuleInterface
+class ExistsDbRule extends DbRule implements RuleInterface
 {
 
     /**
@@ -15,7 +15,7 @@ class MultiExistsIfRule extends DbRule implements RuleInterface
      */
     public static function get($attribute, $value, $parameters, $validator)
     {
-        return self::getForExistsIf($attribute, $value, $parameters, $validator, 'multiExistsIf', true);
+        return self::getForExists($attribute, $value, $parameters, $validator, 'exists');
     }
 
 }

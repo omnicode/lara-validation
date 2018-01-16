@@ -391,7 +391,6 @@ class CoreValidator extends Validator implements CoreValidatorInterface, General
         if (!empty($message)) {
             $this->_messages[$messageRule] = $message;
         }
-
         $this->_lastField = $name;
         return $this;
     }
@@ -765,32 +764,21 @@ class CoreValidator extends Validator implements CoreValidatorInterface, General
      * @param string $message
      * @param null $when
      * @return CoreValidator
+     *
+     * all time table or model full name
+     *
+     * $params = 'table'
+     * $params = ['table', 'column']
+     * $params = ['table', 'column', 'connection']
+     *
+     * if 'name' ends with '_id' auto 'column' => id
      */
     public function exists($name, $params = [], $message = '', $when = null)
     {
-        $this->makeArray($params);
-
-        $model = array_shift($params);
-        $table = class_exists($model) ? app($model)->getTable() : $model;
-        $column = !empty($params) ? array_shift($params) : $name;
-        $connection = !empty($params) ? array_shift($params) : '';
-
-        $ruleStr = $connection ? $connection . '.' : '';
-        $ruleStr .= $table . ',' . $column;
-
-        return $this->fixRuleStructure($name, 'exists',  $ruleStr, $message, $when);
-    }
-
-    /**
-     * @param $name
-     * @param array $params
-     * @param string $message
-     * @param null $when
-     * @return CoreValidator
-     */
-    public function multiExists($name, $params = [], $message = '', $when = null)
-    {
-        return $this->fixRuleStructure($name, 'multiExists', $params, $message, $when);
+        if (empty($message)) {
+            $message = 'Invalid argument is supplied';
+        }
+        return $this->fixRuleStructure($name, 'exists_db',  $params, $message, $when);
     }
 
     /**
@@ -800,14 +788,19 @@ class CoreValidator extends Validator implements CoreValidatorInterface, General
      * @param null $when
      * @return CoreValidator
      *
-     * [class, ['column' => value]]
-     * [class, column1, ['column2' => value2]]
-     * [class, column1, ['column2' => value2, column3 => value3]]
-     * [class, column1, ['column2' => value2], [column3 => value3]]
+     * all time table or model full name
+     *
+     * $params = 'table'
+     * $params = ['table']
+     * $params = ['table', 'column']
+     * $params = ['table', 'column', 'connection']
      */
-    public function existsIf($name, $params = [], $message = '', $when = null)
+    public function multiExists($name, $params = [], $message = '', $when = null)
     {
-        return $this->fixDbIfRuleStructure($name, 'existsIf', $params, $message, $when);
+        if (empty($message)) {
+            $message = 'Invalid argument is supplied';
+        }
+        return $this->fixRuleStructure($name, 'multi_exists', $params, $message, $when);
     }
 
     /**
@@ -816,10 +809,45 @@ class CoreValidator extends Validator implements CoreValidatorInterface, General
      * @param string $message
      * @param null $when
      * @return CoreValidator
+     *
+     * all time table or model full name
+     *
+     * $params = ['table', ['column' => value]]
+     * $params = ['table', 'column', ['column1' => value1]]
+     * $params = ['table', 'column', 'connection', ['column1' => value1]]
+     *
+     * $params = ['table', ['column1' => 'value1', 'column2' => 'value2']]
+     * $params = ['table', 'column', ['column1' => 'value1', 'column2' => 'value2']]
+     * $params = ['table', 'column', 'connection', ['column1' => 'value1', 'column2' => 'value2']]
+     *
+     * $params = ['table', ['column1' => 'value1'], ['column2' => 'value2']]
+     * $params = ['table', 'column', ['column1' => 'value1'], ['column2' => 'value2']]
+     * $params = ['table', 'column', 'connection', ['column1' => 'value1'], ['column2' => 'value2']]
+     *
+     */
+    public function existsIf($name, $params = [], $message = '', $when = null)
+    {
+        if (empty($message)) {
+            $message = 'Invalid argument is supplied';
+        }
+        return $this->fixDbIfRuleStructure($name, 'exists_if', $params, $message, $when);
+    }
+
+    /**
+     * @param $name
+     * @param array $params
+     * @param string $message
+     * @param null $when
+     * @return CoreValidator
+     *
+     * parameters see exist if
      */
     public function multiExistsIf($name, $params = [], $message = '', $when = null)
     {
-        return $this->fixDbIfRuleStructure($name, 'multiExistsIf', $params, $message, $when);
+        if (empty($message)) {
+            $message = 'Invalid argument is supplied';
+        }
+        return $this->fixDbIfRuleStructure($name, 'multi_exists_if', $params, $message, $when);
     }
 
     /**
