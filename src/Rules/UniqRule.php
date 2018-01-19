@@ -3,6 +3,7 @@ namespace LaraValidation\Rules;
 
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use LaraValidation\Contracts\RuleInterface;
 
 class UniqRule implements RuleInterface
 {

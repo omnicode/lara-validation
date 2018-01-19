@@ -1,6 +1,10 @@
 <?php
 namespace LaraValidation;
 
+use Illuminate\Support\Facades\Validator;
+use LaraValidation\Contracts\LaraValidatorInterface;
+use LaraValidation\Contracts\RuleInterface;
+
 abstract class LaraValidator implements LaraValidatorInterface
 {
 
@@ -71,7 +75,6 @@ abstract class LaraValidator implements LaraValidatorInterface
             $this->setErrors(null);
             return true;
         }
-
         $this->setErrors($v->errors());
         return false;
     }
