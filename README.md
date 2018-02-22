@@ -216,7 +216,7 @@ for the second parameter(in the array), `implicit` option can be defined as well
 For stopping the valudation rules if the given rule fails, use `bail` or its alias `last`
 ```
 	$this->validator
-		->numeric('some_field'
+		->numeric('some_field')
 		->bail()
 		->minLength('age', 50)
 		->maxLength('email', 100);
