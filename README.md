@@ -28,7 +28,6 @@ It has the following advantages
 	* <a href="#form-requests">Using with form requests</a>
 4. <a href="#methods">Methods</a>
     * <a href="#rule-required">required</a>
-    * <a href="#rule-requiredIfIsset">requiredIfIsset</a>
     * <a href="#rule-minlength">minLength</a>
     * <a href="#rule-maxlength">maxLength</a>
     * <a href="#rule-email">email</a>
@@ -295,12 +294,6 @@ for all methods
 public function required($name, $message = '', $when = null)
 ```
 `$name` can be either string as the field name or array of fields (however in case of array the same error message will be used for all provided fields)
-
-### <a id="rule-requiredIfIsset"></a>requiredIfIsset
-```
-public function requiredIfIsset($name,  $when = null)
-```
-Alias for `required($name, $messages, 'isset')`
 
 ### <a id="rule-minlength"></a>minLength
 ```
