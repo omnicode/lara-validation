@@ -1,3 +1,10 @@
+<p align="center">
+<a href="https://travis-ci.org/omnicode/lara-validation"><img src="https://travis-ci.org/omnicode/lara-validation.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/omnicode/lara-validation"><img src="https://poser.pugx.org/omnicode/lara-validation/d/total.svg" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/omnicode/lara-validation"><img src="https://poser.pugx.org/omnicode/lara-validation/v/stable.svg" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/omnicode/lara-validation"><img src="https://poser.pugx.org/omnicode/lara-validation/license.svg" alt="License"></a>
+</p>
+
 # Lara Validation - wrapper for Laravel Validation
 
 Lara Validation is a powerful wrapper for laravel validations (it is influenced by Cakephp 3 validations)
