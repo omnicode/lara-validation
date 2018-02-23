@@ -872,7 +872,7 @@ class CoreValidator extends Validator implements CoreValidatorInterface, General
      * @return mixed
      * @throws \Exception
      */
-    private function getTextLength($length)
+    protected function getTextLength($length)
     {
         if (is_numeric($length)) {
             return $length;
