@@ -20,8 +20,6 @@ It has the following advantages
 	* <a href="#basic-example">Basic example</a>
 	* <a href="#custom-message">Custom validation message</a>
 	* <a href="#conditional-validation-create-update">Conditional validation during create and update</a>
-	* <a href="#conditional-validation-isset">Conditional validation if value is set</a>
-	* <a href="#conditional-validation-notempty">Conditional validation if value is not empty</a>
 	* <a href="#conditional-validation-callable">Conditional validation with callable method</a>
 	* <a href="#add-laravel-rule">Adding existing laravel rules</a>
 	* <a href="#add-custom-rule">Adding custom rules</a>
@@ -30,7 +28,6 @@ It has the following advantages
 	* <a href="#form-requests">Using with form requests</a>
 4. <a href="#methods">Methods</a>
     * <a href="#rule-required">required</a>
-    * <a href="#rule-requiredIfIsset">requiredIfIsset</a>
     * <a href="#rule-minlength">minLength</a>
     * <a href="#rule-maxlength">maxLength</a>
     * <a href="#rule-email">email</a>
@@ -153,22 +150,6 @@ $this->validator->required('first_name', 'First Name can not be empty', 'create'
 
 // the first_name will be required only when updating the record
 $this->validator->required('first_name', 'First Name can not be empty', 'update');
-```
-
-### <a id="conditional-validation-isset"></a>Conditional validation if value is set
-
-To make the rule to be applied only when the key exists in the data array to be validated
-```
-// the first_name will be required only if 'first_name' key exists in the validated array
-$this->validator->required('first_name', 'First Name can not be empty', 'isset');
-```
-
-### <a id="conditional-validation-notempty"></a>Conditional validation if value is not empty
-
-To make the rule to be applied only when the provided value is not empty
-```
-// the age will be validated to be numeric only if it is provided
-$this->validator->numeric('age', 'Age should be numeric', 'notempty');
 ```
 
 ### <a id="conditional-validation-callable"></a>Conditional validation with callable method
@@ -312,12 +293,6 @@ for all methods
 public function required($name, $message = '', $when = null)
 ```
 `$name` can be either string as the field name or array of fields (however in case of array the same error message will be used for all provided fields)
-
-### <a id="rule-requiredIfIsset"></a>requiredIfIsset
-```
-public function requiredIfIsset($name,  $when = null)
-```
-Alias for `required($name, $messages, 'isset')`
 
 ### <a id="rule-minlength"></a>minLength
 ```
