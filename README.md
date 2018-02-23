@@ -33,7 +33,6 @@ It has the following advantages
     * <a href="#rule-email">email</a>
     * <a href="#rule-numeric">numeric</a>
     * <a href="#rule-unique">unique</a>
-    
 
 ## <a id="installation"></a>Installation
 
@@ -198,7 +197,7 @@ for the second parameter(in the array), `implicit` option can be defined as well
 For stopping the valudation rules if the given rule fails, use `bail` or its alias `last`
 ```
 	$this->validator
-		->numeric('some_field')
+		->numeric('some_field'
 		->bail()
 		->minLength('age', 50)
 		->maxLength('email', 100);
