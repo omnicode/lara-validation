@@ -20,8 +20,6 @@ It has the following advantages
 	* <a href="#basic-example">Basic example</a>
 	* <a href="#custom-message">Custom validation message</a>
 	* <a href="#conditional-validation-create-update">Conditional validation during create and update</a>
-	* <a href="#conditional-validation-isset">Conditional validation if value is set</a>
-	* <a href="#conditional-validation-notempty">Conditional validation if value is not empty</a>
 	* <a href="#conditional-validation-callable">Conditional validation with callable method</a>
 	* <a href="#add-laravel-rule">Adding existing laravel rules</a>
 	* <a href="#add-custom-rule">Adding custom rules</a>
@@ -36,6 +34,7 @@ It has the following advantages
     * <a href="#rule-email">email</a>
     * <a href="#rule-numeric">numeric</a>
     * <a href="#rule-unique">unique</a>
+    
 
 ## <a id="installation"></a>Installation
 
@@ -153,22 +152,6 @@ $this->validator->required('first_name', 'First Name can not be empty', 'create'
 
 // the first_name will be required only when updating the record
 $this->validator->required('first_name', 'First Name can not be empty', 'update');
-```
-
-### <a id="conditional-validation-isset"></a>Conditional validation if value is set
-
-To make the rule to be applied only when the key exists in the data array to be validated
-```
-// the first_name will be required only if 'first_name' key exists in the validated array
-$this->validator->required('first_name', 'First Name can not be empty', 'isset');
-```
-
-### <a id="conditional-validation-notempty"></a>Conditional validation if value is not empty
-
-To make the rule to be applied only when the provided value is not empty
-```
-// the age will be validated to be numeric only if it is provided
-$this->validator->numeric('age', 'Age should be numeric', 'notempty');
 ```
 
 ### <a id="conditional-validation-callable"></a>Conditional validation with callable method
